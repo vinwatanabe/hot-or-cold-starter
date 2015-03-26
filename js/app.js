@@ -1,44 +1,93 @@
 $(document).ready(function(){
-	
-	/*--- Display information modal box ---*/
-  	$(".what").click(function(){
-    	$(".overlay").fadeIn(1000);
+  
+  /*--- Display information modal box ---*/
+    $(".what").click(function(){
+      $(".overlay").fadeIn(1000);
 
-  	});
+    });
 
-  	/*--- Hide information modal box ---*/
-  	$("a.close").click(function(){
-  		$(".overlay").fadeOut(1000);
-  	});
+    /*--- Hide information modal box ---*/
+    $("a.close").click(function(){
+      $(".overlay").fadeOut(1000);
+    });
 
-    /* Pick a random number */
-    var rNumber = Math.round(Math.random()*100);
-    console.log(rNumber);
+    /* variables */
+    var count;
+    var rNumber;
+    var userGuess;
+    var won;
 
-    /* Defining variables */
-    
-    var count = 0;
-
-    function temperature(){
-      if (userGuess === rNumber){
-        $('#feedback').text("Yeah! You got it.");
-      }else{
-        $('#feedback').text("Cold")
-      }
+    /* generating a random number */
+    function generateRandomNumber(){
+      rNumber = Math.round(Math.random()*100);
+      console.log(rNumber);
     }
 
-    /* Write the inserted value on the guess list */
-    $('#guessButton').click(function(){
-      var userGuess = $('#userGuess').val();
-      $('#guessList').append("<li>" + userGuess + "</li>");
-
-      temperature();
+    /* counting the guesses and add to guess list */
+    function countGuess(userNumber){
+      $('#guessList').append("<li>" + userNumber + "</li>");
 
       count++;
       $('#count').text(count);
 
       $('#userGuess').val("");
+    }
+
+
+    /* start a new game */
+    function newGame(){
+      generateRandomNumber();
+
+      count = 0;
+      $('#count').text(count);
+
+      $('#guessList').empty();
+
+      $('#feedback').text("Make your Guess!");
+
+      won = false;
+    }
+
+    /* game status */
+    function gameStatus(){
+      if (won === false){
+        userGuess = parseInt($('#userGuess').val());
+        checkTemperature(userGuess);
+      } else if (won === true){
+        $('#feedback').text("You won. Start a new game!");
+        won = true;
+      }
+    }
+
+    /* checking the temperature */
+    function checkTemperature(guess){
+      if (guess === rNumber){
+        $('#feedback').text("Yeah! You got it.");
+        countGuess(guess);
+        won = true;
+      } else if(isNaN(guess) || guess === " "){
+        $('#feedback').text("Type only numbers");
+      } else if (guess <= rNumber + 10 && guess >= rNumber - 10){
+        $('#feedback').text("Hot");
+        countGuess(guess);
+      } else if (guess <= rNumber + 20 && guess >= rNumber - 20){
+        $('#feedback').text("Cold");
+        countGuess(guess);
+      } else if (guess !== rNumber){
+        $('#feedback').text("Very Cold");
+        countGuess(guess);
+      } 
+    }
+
+    $('#guessButton').click(function(){
+      gameStatus();
 
       event.preventDefault();
     });
+
+    $('.new').click(function(){
+      newGame();
+    });
+
+    newGame();
 });
